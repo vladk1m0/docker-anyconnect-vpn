@@ -1,13 +1,23 @@
-version: '3'
+version: '3.4'
 
 services:
   vpn:
-    container_name: vpn
-    image: jetbrainsinfra/docker-anyconnect-vpn
+    container_name: openconnect-vpn
+    build: .
+    image: openconnect-vpn
+    ports:
+      - ${HOST_PORT_1}:${HOST_PORT_1}
+      #...
+      #- ${HOST_PORT_N}:${HOST_PORT_N}
     environment:
-      - ANYCONNECT_SERVER=${ANYCONNECT_SERVER}
-      - ANYCONNECT_USER=${ANYCONNECT_USER}
-      - ANYCONNECT_PASSWORD=${ANYCONNECT_PASSWORD}
+      - URL=${VPN_URL}
+      - USER=${VPN_USER}
+      - PASSWORD=${VPN_PASSWORD}
+      - OPTIONS=${VPN_OPTIONS}
+      # To expose VPN service ports outside Docker container setup PORT_MAP_APP_i=<HOST_PORT_i>|<VPN_SERVICE_HOST_PORT_i> env var for each VPN service:
+      - PORT_MAP_APP_1=${HOST_PORT_1}|${VPN_SERVICE_HOST_PORT_1}
+      #...
+      #- PORT_MAP_APP_N=${HOST_PORT_N}|${VPN_SERVICE_HOST_PORT_N}
     networks:
       - default
     privileged: true
@@ -16,11 +26,3 @@ services:
     restart: unless-stopped
     security_opt:
       - label:disable
-  packer:
-    container_name: packer
-    image: alpine
-    tty: true
-    entrypoint: /bin/sleep 10
-    depends_on:
-      - vpn
-    network_mode: "service:vpn"
