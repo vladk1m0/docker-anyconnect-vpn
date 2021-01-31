@@ -19,11 +19,14 @@ How to use
     VPN_USER=<Username>
     VPN_PASSWORD=<Password>
     VPN_OPTIONS=--protocol=<Protocol> \
-                --authgroup=<VPN Group> \
-                --servercert=<VPN Server Certificate> \
-    #When using multi-factor authentication with TOTP add additional options:
+                --authgroup=<VPN group> \
+                --servercert=<VPN server TLS certificate fingerprint pin-sha256 type> \
+    # To generate pin-sha256 fingerprint you can use openssl:
+    # openssl s_client -showcerts -connect $VPN_HOST:443 </dev/null 2>/dev/null | openssl x509 -outform der | openssl dgst -sha256 -binary | openssl enc -base64
+    #
+    # When using multi-factor authentication with TOTP add additional options:
                 --timestamp --token-mode=totp --token-secret=<TOTP secret>
-    #To expose VPN service ports outside Docker container add the group of environment variables for each VPN service:
+    # To expose VPN service ports outside Docker container add the group of environment variables for each VPN service:
     HOST_PORT_1=<Host port for service 1>
     VPN_SERVICE_HOST_PORT_1=<VPN service 1 endpoint ip:port>
     #...
